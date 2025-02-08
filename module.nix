@@ -92,15 +92,10 @@ in {
           description = "Arguments to pass to `buildDepsOnly`.
           This is mostly useful if a dependency requires additional build inputs.";
           type = with lib.types; attrsOf anything;
-          default.src = filteredSource;
         };
         craneArgs = lib.mkOption {
           description = "The materialized crane args";
           type = with lib.types; attrsOf anything;
-          default = {
-            src = filteredSource;
-            cargoArtifacts = craneLib.buildDepsOnly cfg'.craneDepsArgs;
-          };
         };
         shell = {
           enable = lib.mkEnableOption "devshell" // { default = true; };
@@ -112,6 +107,13 @@ in {
         };
       };
       config = {
+        crane = {
+          craneDepsArgs.src = filteredSource;
+          craneArgs = {
+            src = filteredSource;
+            cargoArtifacts = craneLib.buildDepsOnly cfg'.craneDepsArgs;
+          };
+        };
         packages = builtins.mapAttrs (name: args: craneLib.buildPackage (cfg'.craneArgs // args)) cfg'.packages;
         checks =
           lib.concatMapAttrs (name: args: {
