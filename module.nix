@@ -11,7 +11,7 @@
   cfg = config.crane;
   filteredSource = lib.cleanSourceWith (let
     # craneLib.path isn't system- or pkgs- dependent, so arbitrary system is safe
-    src = crane.lib.aarch64-linux.path config.crane.source;
+    src = (crane.mkLib inputs.nixpkgs.legacyPackages.aarch64-darwin).path config.crane.source;
   in {
     src = lib.cleanSource src;
     filter = path: type: (
@@ -52,7 +52,7 @@ in {
     crane.overlays = [rust-overlay.overlays.default];
     # craneLib.filterCargoSources isn't system- or pkgs- dependent, so arbitrary system is safe
     # Using a different system from previous to crash things if that's necessary
-    crane.includeSource = [crane.lib.x86_64-linux.filterCargoSources];
+    crane.includeSource = [(crane.mkLib inputs.nixpkgs.legacyPackages.x86_64-linux).filterCargoSources];
 
     perSystem = {
       config,
